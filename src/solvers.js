@@ -26,21 +26,21 @@ window.findNRooksSolution = function(n) {
   return matrix;
 };
 
-window.solutionsFinder = function(board, n, method, depth = 0) {
-  if (depth === n) {
+window.solutionsFinder = function(board, n, method, row = 0) {
+  if (row === n) {
     return 1;
   }
   
   var count = 0;
 
   for (var colIndex = 0; colIndex < n; colIndex++) {
-    board.togglePiece(depth, colIndex);
+    board.togglePiece(row, colIndex);
     
     if (!board[method]()) {
-      count += solutionsFinder(board, n, method, depth + 1);
+      count += solutionsFinder(board, n, method, row + 1);
     } 
 
-    board.togglePiece(depth, colIndex);
+    board.togglePiece(row, colIndex);
   }
   
   return count;
@@ -59,21 +59,21 @@ window.findNQueensSolution = function(n) {
   var board = new Board({n: n});
   var result = JSON.stringify(board.rows());
   //finds a single solution, not multiple
-  var solutionFinder = function(depth) {
-    depth = depth || 0;
+  var solutionFinder = function(row) {
+    row = row || 0;
 
-    if (depth === n) {
+    if (row === n) {
       result = JSON.stringify(board.rows());
       return;
     } else {
       for (var colIndex = 0; colIndex < n; colIndex++) {
-        board.togglePiece(depth, colIndex);
+        board.togglePiece(row, colIndex);
         
         if (!board.hasAnyQueensConflicts()) {
-          solutionFinder(depth + 1);
+          solutionFinder(row + 1);
         }
 
-        board.togglePiece(depth, colIndex);
+        board.togglePiece(row, colIndex);
       }
     }
   };
