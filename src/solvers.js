@@ -23,54 +23,48 @@ window.findNRooksSolution = function(n) {
     board.togglePiece(i, i);
   }
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(matrix));
-  console.log('about to return for', n);
-
   return matrix;
 };
 
-var solutionsFinder = function(board, depth, n, type) {
+window.solutionsFinder = function(board, n, method, depth = 0) {
+  if (depth === n) {
+    return 1;
+  }
+  
   var count = 0;
 
-  if (depth === n) {
-    count++;
-  } else {
-    for (var colIndex = 0; colIndex < n; colIndex++) {
-      board.togglePiece(depth, colIndex);
-      
-      if (type === 'rooks' && !board.hasAnyRooksConflicts()) {
-        count += solutionsFinder(board, depth + 1, n, 'rooks');
-      } else if (type === 'queens' && !board.hasAnyQueensConflicts()) {
-        count += solutionsFinder(board, depth + 1, n, 'queens');
-      }
+  for (var colIndex = 0; colIndex < n; colIndex++) {
+    board.togglePiece(depth, colIndex);
+    
+    if (!board[method]()) {
+      count += solutionsFinder(board, n, method, depth + 1);
+    } 
 
-      board.togglePiece(depth, colIndex);
-    }
+    board.togglePiece(depth, colIndex);
   }
-
+  
   return count;
 };
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var board = new Board({n: n});
-  //helper function defined outside of this function to abstract the code to work with both rooks and queens
-  var count = solutionsFinder(board, 0, n, 'rooks');
 
-  console.log('Number of solutions for ' + n + ' rooks:', count);
-  return count;
+  var nRooksSolutions = solutionsFinder(board, n, 'hasAnyRooksConflicts');
+  return nRooksSolutions;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
   var board = new Board({n: n});
   var result = JSON.stringify(board.rows());
-
   //finds a single solution, not multiple
   var solutionFinder = function(depth) {
+    depth = depth || 0;
 
     if (depth === n) {
       result = JSON.stringify(board.rows());
+      return;
     } else {
       for (var colIndex = 0; colIndex < n; colIndex++) {
         board.togglePiece(depth, colIndex);
@@ -84,20 +78,17 @@ window.findNQueensSolution = function(n) {
     }
   };
 
-  solutionFinder(0);
+  solutionFinder();
   var solution = JSON.parse(result);
 
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+
   return solution;
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
   var board = new Board({n: n});
-  var count = 0;
-
-  var count = solutionsFinder(board, 0, n, 'queens');
-
-  console.log('Number of solutions for ' + n + ' queens:', count);
-  return count;
+  var nQueensSolutions = solutionsFinder(board, n, 'hasAnyQueensConflicts');
+  
+  return nQueensSolutions;
 };
